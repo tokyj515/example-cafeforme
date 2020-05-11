@@ -151,7 +151,7 @@ PW : 6400
 
 ## 헥사고날 아키텍처 다이어그램 도출
     
-![image](https://user-images.githubusercontent.com/28293389/81540109-21443e80-93ac-11ea-8cf6-d3682de207c4.png)
+![image](https://user-images.githubusercontent.com/28293389/81541063-877d9100-93ad-11ea-931a-066f21747fb5.png)
 
 
     - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
