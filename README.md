@@ -11,6 +11,7 @@ PW : 6400
 # Table of contents
 
 - [5조 - 카페포미](#---)
+  - [조직](#조직)
   - [서비스 시나리오](#서비스-시나리오)
   - [분석/설계](#분석설계)
   - [구현:](#구현-)
@@ -25,6 +26,12 @@ PW : 6400
     - [오토스케일 아웃](#오토스케일-아웃)
     - [무정지 재배포](#무정지-재배포)
   - [신규 개발 조직의 추가](#신규-개발-조직의-추가)
+
+# 조직
+- 고객 : 고객 주문 오류를 최소화 한다. ( Core )
+- 매장 : 접수 된 주문에 대해 오류를 최소화 한다. ( Supporting )
+- 고객관리 : 주문 상태에 대해 고객에게 정확한 알람을 제공한다. ( Supporting )
+- 결제 : 주문 상태에 대한 결제 오류를 최소화 한다. ( General )
 
 # 서비스 시나리오
 
@@ -144,7 +151,7 @@ PW : 6400
 
 ## 헥사고날 아키텍처 다이어그램 도출
     
-![image](https://user-images.githubusercontent.com/487999/79684772-eba9ab00-826e-11ea-9405-17e2bf39ec76.png)
+![image](https://user-images.githubusercontent.com/28293389/81540109-21443e80-93ac-11ea-8cf6-d3682de207c4.png)
 
 
     - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
