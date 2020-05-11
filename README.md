@@ -1,6 +1,8 @@
 ID : 5team@gkn2019hotmail.onmicrosoft.com  
 PW : 6400
 
+![image](https://user-images.githubusercontent.com/28293389/81536861-34084480-93a7-11ea-866f-c09e24ef9412.png)
+
 # 5조 - 카페포미
 
 - 체크포인트 : https://workflowy.com/s/assessment-check-po/T5YrzcMewfo4J6LW
