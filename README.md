@@ -86,8 +86,7 @@ PW : 6400
 ### 2차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
 
 기능적 요구사항(검증)
-
-![image](https://user-images.githubusercontent.com/63624054/81642313-10ec9c00-945e-11ea-99c8-87beb4e630eb.png)
+![image](https://user-images.githubusercontent.com/63624054/81644736-48117c00-9463-11ea-8ccc-6d3e4849bea9.png)
 
 1. 고객이 온라인으로 주문 내역을 만든다.
 1. 고객이 주문 내역으로 결제한다.
@@ -104,8 +103,7 @@ PW : 6400
 
 
  비기능적 요구사항(검증)
- 
-![image](https://user-images.githubusercontent.com/63624054/81642399-44c7c180-945e-11ea-8348-23990ab8d40d.png)
+ ![image](https://user-images.githubusercontent.com/63624054/81642399-44c7c180-945e-11ea-8348-23990ab8d40d.png)
 
 1. 트랜잭션
     1. 주문시 결제가 성립되어야 한다.  Sync 호출 
