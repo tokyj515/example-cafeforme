@@ -137,7 +137,7 @@ mvn spring-boot:run
 cd deliverty
 mvn spring-boot:run 
 
-cd customermanagement
+cd SMSExternal
 mvn spring-boot:run  
 
 ```
