@@ -111,7 +111,7 @@ PW : 6400
 
 ### 완성된 1차 모형
 
-![image](https://user-images.githubusercontent.com/487999/79683646-63bfa300-8266-11ea-9bc5-c0b650507ac8.png)
+![image](https://user-images.githubusercontent.com/63624054/81624992-9ce8ce80-9432-11ea-94ee-47a019a74bcd.png)
 
     - View Model 추가
 
