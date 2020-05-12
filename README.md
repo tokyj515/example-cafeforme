@@ -89,7 +89,7 @@ PW : 6400
 
 ### 2차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
 
-기능적 요구사항-검증
+기능적 요구사항(검증)
 
 ![image](https://user-images.githubusercontent.com/63624054/81642313-10ec9c00-945e-11ea-99c8-87beb4e630eb.png)
 
@@ -105,7 +105,9 @@ PW : 6400
 1. 주문 진행 상태가 바뀔 때 마다 SMS로 알림을 보낸다.
 
 
- 비기능적 요구사항-검증
+
+
+ 비기능적 요구사항(검증)
  
 ![image](https://user-images.githubusercontent.com/63624054/81642399-44c7c180-945e-11ea-8348-23990ab8d40d.png)
 
