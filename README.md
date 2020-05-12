@@ -113,6 +113,10 @@ PW : 6400
 
 ![image](https://user-images.githubusercontent.com/63624054/81624992-9ce8ce80-9432-11ea-94ee-47a019a74bcd.png)
 
+### 완성된 2차 모형
+![image](https://user-images.githubusercontent.com/63624054/81637640-cd8c3080-9451-11ea-8446-46ec36b17108.png)
+
+
     - View Model 추가
 
 ### 1차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증
