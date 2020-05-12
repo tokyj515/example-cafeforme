@@ -14,7 +14,7 @@ variables:
   # containerRegistryDockerConnection: 'acr'
   # environment: 'aks.default'
 - name: imageRepository
-  value: 'Customer'
+  value: 'customer'
 - name: dockerfilePath
   value: '**/Dockerfile'
 - name: tag
@@ -91,7 +91,7 @@ stages:
                   labels:
                     app: $(imageRepository)
                 spec:
-                  replicas: 1
+                  replicas: 3
                   selector:
                     matchLabels:
                       app: $(imageRepository)
@@ -115,7 +115,7 @@ stages:
                             failureThreshold: 10
                           livenessProbe:
                             httpGet:
-                              path: /products/1
+                              path: /actuator/health
                               port: 8080
                             initialDelaySeconds: 120
                             timeoutSeconds: 2

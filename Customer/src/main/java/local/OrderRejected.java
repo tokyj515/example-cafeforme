@@ -3,21 +3,13 @@ package local;
 
 public class OrderRejected extends AbstractEvent {
 
-    private Long id;
-    private Long OrderID;
+    private Long orderId;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
     public Long getOrderId() {
-        return OrderID;
+        return orderId;
     }
 
-    public void setOrderId(Long OrderID) {
-        this.OrderID = OrderID;
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 }
