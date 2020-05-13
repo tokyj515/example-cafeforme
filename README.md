@@ -312,22 +312,15 @@ public void onPostUpdate(){
 # 상점 서비스 (store) 를 잠시 내려놓음 (ctrl+c)
 
 #주문처리
-http POST customer:8080/orders product="IceAmericano" qty=1 price=2000
-http POST customer:8080/orders product="IceAmericano2" qty=1 price=2000
 
 #주문상태 확인
-http customer:8080/orders     # 주문 상태 : pay_success
 
 #상점 서비스 기동
-cd 상점
 mvn spring-boot:run
 
 #상점 주인의 수락/거절 진행
-http PUT delivery:8080/deliveries/1 status="receive"
-http PUT delivery:8080/deliveries/2 status="reject"
 
 #주문상태 확인
-http customer:8080/orders     # 상점 주인의 선택에 따라 변동
 ```
 
 
@@ -345,7 +338,6 @@ http customer:8080/orders     # 상점 주인의 선택에 따라 변동
     Customer : CPU 사용량이 50프로를 넘어서면 replica를 10개까지 늘려준다(최소 3)  
     Delivery : CPU 사용량이 50프로를 넘어서면 replica를 5개까지 늘려준다(최소 1)
 ```
-kubectl autoscale deploy customer --min=3 --max=10 --cpu-percent=50
 kubectl autoscale deploy delivery --min=1 --max=5 --cpu-percent=50
 ```
 - 부하 테스트를 위해 cpu-percent를 임시 조정
