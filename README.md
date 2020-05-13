@@ -134,7 +134,7 @@ PW : 6400
 cd customer
 mvn spring-boot:run
 
-cd deliverty
+cd delivery
 mvn spring-boot:run 
 
 cd SMSExternal
