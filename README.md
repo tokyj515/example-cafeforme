@@ -4,6 +4,7 @@ PW : 6400
 ![image](https://user-images.githubusercontent.com/28293389/81536861-34084480-93a7-11ea-866f-c09e24ef9412.png)
 
 # 5조 - 카페포미
+        지윤진(리더), 한국진, 최영준, 이교광
 
 - 체크포인트 : https://workflowy.com/s/assessment-check-po/T5YrzcMewfo4J6LW
 
@@ -17,13 +18,10 @@ PW : 6400
   - [구현:](#구현-)
     - [DDD 의 적용](#ddd-의-적용)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
-    - [비동기식 호출 과 Eventual Consistency](#비동기식-호출-과-Eventual-Consistency)
   - [운영](#운영)
     - [CI/CD 설정](#cicd설정)
-    - [동기식 호출 / 서킷 브레이킹 / 장애격리](#동기식-호출-서킷-브레이킹-장애격리)
     - [오토스케일 아웃](#오토스케일-아웃)
     - [무정지 재배포](#무정지-재배포)
-  - [신규 개발 조직의 추가](#신규-개발-조직의-추가)
 
 # 조직
 - 고객 : 고객 주문 오류를 최소화 한다. ( Core )
@@ -335,7 +333,6 @@ mvn spring-boot:run
 
 - Customer/Delivery 서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다.  
   
-    Customer : CPU 사용량이 50프로를 넘어서면 replica를 10개까지 늘려준다(최소 3)  
     Delivery : CPU 사용량이 50프로를 넘어서면 replica를 5개까지 늘려준다(최소 1)
 ```
 kubectl autoscale deploy delivery --min=1 --max=5 --cpu-percent=50
