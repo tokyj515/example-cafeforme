@@ -1,3 +1,7 @@
+
+readiness 빼고
+gateway 수정
+
 ID : 5team@gkn2019hotmail.onmicrosoft.com  
 PW : 6400
 
