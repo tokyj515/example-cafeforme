@@ -15,13 +15,23 @@ PW : 6400
   - [조직](#조직)
   - [서비스 시나리오](#서비스-시나리오)
   - [분석/설계](#분석설계)
+    - [AS-IS 조직 (Horizontally-Aligned)]
+    - [TO-BE 조직 (Vertically-Aligned)]
+    - [Event Storming 결과-1차, 2차]
+    - [2차 완성본에 대한 기능적/비기능적 요구사항을 커버하는지 검증]
+    - [비기능적 요구사항(검증)]
+    - [헥사고날 아키텍처 다이어그램 도출]
   - [구현:](#구현-)
     - [DDD 의 적용](#ddd-의-적용)
     - [동기식 호출 과 Fallback 처리](#동기식-호출-과-Fallback-처리)
+    - 장애 격리
+    - [비동기식 호출 / 시간적 디커플링 / 장애격리 / 최종 (Eventual) 일관성 테스트](#비동기식-호출-과-Eventual-Consistency)
   - [운영](#운영)
     - [CI/CD 설정](#cicd설정)
     - [오토스케일 아웃](#오토스케일-아웃)
     - [무정지 재배포](#무정지-재배포)
+  - 구현
+  - 운영과 Retirement
 
 # 조직
 - 고객 : 고객 주문 오류를 최소화 한다. ( Core )
@@ -51,6 +61,7 @@ PW : 6400
 1. 성능
     1. 고객이 주문 진행 상태를 수시로 조회할 수 있어야 한다.  CQRS
     1. 고객은 주문 진행 상태를 SMS로 확인할 수 있어야 한다.  Event driven
+
 
 
 
@@ -112,6 +123,8 @@ PW : 6400
     1. 고객은 주문 진행 상태를 SMS로 확인할 수 있어야 한다.  Event driven
 
 
+## 업무 프로세스 흐름도
+![image](https://user-images.githubusercontent.com/28293389/81764601-e4dc2400-950c-11ea-9898-050e8ff02a71.png)
 
 
 ## 헥사고날 아키텍처 다이어그램 도출
@@ -307,18 +320,27 @@ public void onPostUpdate(){
 
 상점 시스템은 주문/결제와 완전히 분리되어있으며, 이벤트 수신에 따라 처리되기 때문에, 상점시스템이 유지보수로 인해 잠시 내려간 상태라도 주문을 받는데 문제가 없다:
 ```
+# 테스트 편의성을 위해 Local에서 진행
 # 상점 서비스 (store) 를 잠시 내려놓음 (ctrl+c)
 
 #주문처리
+http POST localhost:8081/orders product="IceAmericano" qty=1 price=2000 
 
 #주문상태 확인
+http localhost:8081/orderStatuses/1     # 주문 상태 : pay_success
 
 #상점 서비스 기동
+cd delivery
 mvn spring-boot:run
 
+#상점에서 주문 확인
+http localhost:8084/deliveries/1        # 주문 상태 : order_get
+
 #상점 주인의 수락/거절 진행
+http PUT localhost:8084/deliveries/1 status="receive"
 
 #주문상태 확인
+http localhost:8081/orderStatuses/1     # 주문 상태 : order_received
 ```
 
 
@@ -333,8 +355,10 @@ mvn spring-boot:run
 
 - Customer/Delivery 서비스에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다.  
   
+    Customer : CPU 사용량이 50프로를 넘어서면 replica를 10개까지 늘려준다(최소 1)  
     Delivery : CPU 사용량이 50프로를 넘어서면 replica를 5개까지 늘려준다(최소 1)
 ```
+kubectl autoscale deploy customer --min=1 --max=10 --cpu-percent=50
 kubectl autoscale deploy delivery --min=1 --max=5 --cpu-percent=50
 ```
 - 부하 테스트를 위해 cpu-percent를 임시 조정
@@ -441,3 +465,49 @@ Shortest transaction:           0.00
 Request/Response 방식으로 구현하지 않았기 때문에 서비스가 더이상 불필요해져도 Deployment 에서 제거되면 기존 마이크로 서비스에 어떤 영향도 주지 않음.
 
 * [비교] 결제 (pay) 외부 서비스의 경우 API 변화나 Retire 시에 주문 (customer) 마이크로 서비스의 변경을 초래함:
+
+
+## 시연용 프로세스
+
+- 고객이 온라인으로 주문 내역을 만든다.
+```
+http POST http://customer:8080/orders product="IceAmericano" qty=1 price=2000
+```
+- 고객이 주문 내역으로 결제한다. (외부 API를 통한 동기식 진행)
+```
+http http://customer:8080/orderStatuses
+```
+- 주문 내역이 결제 되면 해당 내역을 매장에서 접수하거나 거절한다.
+```
+http http://delivery:8080/deliveries
+```
+- 매장에서 접수하면 커피를 제작하고 고객이 주문을 취소할 수 없다.
+```
+http PUT http://delivery:8080/deliveries/1 product="IceAmericano" qty=1 status="receive"
+```
+- 매장에서 거절하면 주문 내역이 취소되고 결제가 환불 된다.
+```
+http PUT http://delivery:8080/deliveries/1 product="IceAmericano" qty=1 status="reject"
+```
+- 고객이 주문 내역을 취소를 요청할 수 있다.
+```
+http PUT http://customer:8080/orders/1 product="IceAmericano" qty=1 status="order_cancel_request"
+```
+
+- 매장에서 주문 내역 취소 요청을 받으면 취소가 가능하다면 취소한다.
+```
+http http://delivery:8080/deliveries
+```
+- 주문 내역이 취소되면 결제가 환불 된다.
+- 매장에서 커피가 제작 되면 고객이 주문 건을 픽업한다.
+- 주문 진행 상태가 바뀔 때 마다 SMS로 알림을 보낸다.
+
+## 참고 명령어
+- httpie pod 접속
+```
+kubectl exec -it httpie bin/bash
+```
+- Order Status 확인
+```
+http http://customer:8080/orderStatuses
+```
