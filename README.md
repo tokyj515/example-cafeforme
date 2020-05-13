@@ -118,13 +118,7 @@ PW : 6400
 
 ## 헥사고날 아키텍처 다이어그램 도출
     
-![image](https://user-images.githubusercontent.com/28293389/81541063-877d9100-93ad-11ea-931a-066f21747fb5.png)
-
-
-    - Chris Richardson, MSA Patterns 참고하여 Inbound adaptor와 Outbound adaptor를 구분함
-    - 호출관계에서 PubSub 과 Req/Resp 를 구분함
-    - 서브 도메인과 바운디드 컨텍스트의 분리:  각 팀의 KPI 별로 아래와 같이 관심 구현 스토리를 나눠가짐
-
+![image](https://user-images.githubusercontent.com/28293389/81763871-3683af00-950b-11ea-96af-5ac25a5631a4.png)
 
 # 구현:
 
@@ -143,7 +137,7 @@ mvn spring-boot:run
 
 ## DDD 의 적용
 
-- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 pay 마이크로 서비스). 이때 가능한 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 그대로 사용하려고 노력했다.
+- 각 서비스내에 도출된 핵심 Aggregate Root 객체를 Entity 로 선언하였다: (예시는 Delivery 마이크로 서비스). 이때 가능한 현업에서 사용하는 언어 (유비쿼터스 랭귀지)를 그대로 사용하려고 노력했다.
 
 ```
 package local;
@@ -354,7 +348,36 @@ http customer:8080/orders     # 상점 주인의 선택에 따라 변동
 kubectl autoscale deploy customer --min=3 --max=10 --cpu-percent=50
 kubectl autoscale deploy delivery --min=1 --max=5 --cpu-percent=50
 ```
-- 부하 테스트는 Skip
+- 부하 테스트를 위해 cpu-percent를 임시 조정
+```
+kubectl autoscale deploy customer --min=3 --max=10 --cpu-percent=5
+```
+
+- siege 를 통해 test를 진행하였으나 충분한 부하가 걸리지 않아 hpa는 확인하지 못하였다.
+```
+NAME                            READY   STATUS    RESTARTS   AGE
+pod/customer-85f968c94c-b254s   1/1     Running   0          15m
+pod/customer-85f968c94c-k5pq4   1/1     Running   0          14m
+pod/customer-85f968c94c-pgwd7   1/1     Running   0          15m
+pod/delivery-78f4bb9f9b-7h42s   1/1     Running   0          68m
+pod/gateway-675c9b584d-tr7cv    1/1     Running   0          17h
+pod/httpie                      1/1     Running   1          18h
+```
+```
+Transactions:                  12858 hits
+Availability:                 100.00 %
+Elapsed time:                 119.46 secs
+Data transferred:               3.42 MB
+Response time:                  0.43 secs
+Transaction rate:             107.63 trans/sec
+Throughput:                     0.03 MB/sec
+Concurrency:                   46.27
+Successful transactions:       12858
+Failed transactions:               0
+Longest transaction:            2.44
+Shortest transaction:           0.00
+```
+
 
 
 ## 무정지 재배포
@@ -420,14 +443,6 @@ Shortest transaction:           0.00
 배포기간 동안 Availability 가 변화없기 때문에 무정지 재배포가 성공한 것으로 확인됨.
 
 
-## 이벤트 스토밍 
-    ![image](https://user-images.githubusercontent.com/487999/79685356-2b729180-8273-11ea-9361-a434065f2249.png)
-
-
-## 헥사고날 아키텍처 변화 
-
-![image](https://user-images.githubusercontent.com/487999/79685243-1d704100-8272-11ea-8ef6-f4869c509996.png)
-
 ## 구현  
 
 기존의 마이크로 서비스에 수정을 발생시키지 않도록 Inbund 요청을 REST 가 아닌 Event 를 Subscribe 하는 방식으로 구현. 기존 마이크로 서비스에 대하여 아키텍처나 기존 마이크로 서비스들의 데이터베이스 구조와 관계없이 추가됨. 
@@ -436,43 +451,4 @@ Shortest transaction:           0.00
 
 Request/Response 방식으로 구현하지 않았기 때문에 서비스가 더이상 불필요해져도 Deployment 에서 제거되면 기존 마이크로 서비스에 어떤 영향도 주지 않음.
 
-* [비교] 결제 (pay) 마이크로서비스의 경우 API 변화나 Retire 시에 app(주문) 마이크로 서비스의 변경을 초래함:
-
-예) API 변화시
-```
-# Order.java (Entity)
-
-    @PostPersist
-    public void onPostPersist(){
-
-        fooddelivery.external.결제이력 pay = new fooddelivery.external.결제이력();
-        pay.setOrderId(getOrderId());
-        
-        Application.applicationContext.getBean(fooddelivery.external.결제이력Service.class)
-                .결제(pay);
-
-                --> 
-
-        Application.applicationContext.getBean(fooddelivery.external.결제이력Service.class)
-                .결제2(pay);
-
-    }
-```
-
-예) Retire 시
-```
-# Order.java (Entity)
-
-    @PostPersist
-    public void onPostPersist(){
-
-        /**
-        fooddelivery.external.결제이력 pay = new fooddelivery.external.결제이력();
-        pay.setOrderId(getOrderId());
-        
-        Application.applicationContext.getBean(fooddelivery.external.결제이력Service.class)
-                .결제(pay);
-
-        **/
-    }
-```
+* [비교] 결제 (pay) 외부 서비스의 경우 API 변화나 Retire 시에 주문 (customer) 마이크로 서비스의 변경을 초래함:
